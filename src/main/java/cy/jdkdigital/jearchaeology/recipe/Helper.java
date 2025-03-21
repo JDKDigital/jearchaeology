@@ -51,12 +51,12 @@ public class Helper
                         });
                     }
                 }
-                String locationName = lootTableKey.location().getPath();
-                if (items.size() > 42) {
+                String locationName = pair.getFirst();
+                if (items.size() > 64) {
                     recipeList.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, locationName + "_4"), new BrushingRecipe(Ingredient.of(items.values().stream().limit(42).skip(21).toList().toArray(new ItemStack[0])), 1f, pair.getSecond())));
                     recipeList.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, locationName + "_3"), new BrushingRecipe(Ingredient.of(items.values().stream().skip(42).toList().toArray(new ItemStack[0])), 1f, pair.getSecond())));
                 }
-                if (items.size() > 21) {
+                if (items.size() > 32) {
                     recipeList.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, locationName + "_2"), new BrushingRecipe(Ingredient.of(items.values().stream().limit(21).toList().toArray(new ItemStack[0])), 1f, pair.getSecond())));
                     recipeList.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, locationName + "_1"), new BrushingRecipe(Ingredient.of(items.values().stream().skip(21).toList().toArray(new ItemStack[0])), 1f, pair.getSecond())));
                 } else {
@@ -74,7 +74,6 @@ public class Helper
             LootParams lootparams = (new LootParams.Builder(level)).withParameter(LootContextParams.ORIGIN, new Vec3(0, 0, 0)).withParameter(LootContextParams.THIS_ENTITY, sniffer).create(LootContextParamSets.GIFT);
             Map<Item, ItemStack> items = new HashMap<>();
             var table = level.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.SNIFFER_DIGGING);
-            JEArchaeology.LOGGER.info("table " + table);
             for (int i = 0; i < 400; i++) {
                 table.getRandomItems(lootparams).forEach(itemStack -> {
                     if (!items.containsKey(itemStack.getItem())) {

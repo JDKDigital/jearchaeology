@@ -28,7 +28,7 @@ public class BrushRecipeCategory implements IRecipeCategory<RecipeHolder<Brushin
     private final IDrawable icon;
 
     public BrushRecipeCategory(IGuiHelper guiHelper) {
-        this.background = guiHelper.createBlankDrawable(126, 70);
+        this.background = guiHelper.createBlankDrawable(144, 93);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Items.BRUSH));
     }
 
@@ -56,17 +56,17 @@ public class BrushRecipeCategory implements IRecipeCategory<RecipeHolder<Brushin
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<BrushingRecipe> recipe, @NotNull IFocusGroup iFocusGroup) {
         AtomicInteger i = new AtomicInteger();
         Arrays.stream(recipe.value().item.getItems()).forEach(itemStack -> {
-            int row = (int)Math.floor(i.get() /7f);
-            builder.addSlot(RecipeIngredientRole.OUTPUT, (i.get() - (row*7)) * 18, row * 18).addItemStack(itemStack).setSlotName("thing" + i);
+            int row = (int)Math.floor(i.get() / 8f);
+            builder.addSlot(RecipeIngredientRole.OUTPUT, (i.get() - (row * 8)) * 18, row * 18).addItemStack(itemStack).setSlotName("thing" + i);
             i.set(i.get() + 1);
         });
-        builder.addSlot(RecipeIngredientRole.INPUT, 0, 56).addIngredients(recipe.value().brushableBlock).setSlotName("sussy_block");
+        builder.addSlot(RecipeIngredientRole.INPUT, 0, 74).addIngredients(recipe.value().brushableBlock).setSlotName("sussy_block");
     }
 
     @Override
     public void draw(RecipeHolder<BrushingRecipe> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         Minecraft minecraft = Minecraft.getInstance();
-        var name = recipe.id().getPath().replace("archaeology/", "").replaceAll("_[0-9]", "");
-        guiGraphics.drawString(minecraft.font, Component.translatable(JEArchaeology.MODID + ".brush.structure." + name), 22, 60, 0xFF000000, false);
+        var name = recipe.id().getPath().replace("archeology/", "").replace("archaeology/", "").replaceAll("_[0-9]", "");
+        guiGraphics.drawString(minecraft.font, Component.translatable(JEArchaeology.MODID + ".brush.structure." + name), 22, 78, 0xFF000000, false);
     }
 }

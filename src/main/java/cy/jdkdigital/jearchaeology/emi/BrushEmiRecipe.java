@@ -15,7 +15,7 @@ public class BrushEmiRecipe extends BasicEmiRecipe
     private final RecipeHolder<BrushingRecipe> recipe;
 
     public BrushEmiRecipe(RecipeHolder<BrushingRecipe> recipe) {
-        super(EmiPlugin.BRUSHING_CATEGORY, recipe.id(), 126, 75);
+        super(EmiPlugin.BRUSHING_CATEGORY, recipe.id(), 144, 93);
 
         this.inputs.add(EmiIngredient.of(recipe.value().brushableBlock));
         for (ItemStack itemStack : recipe.value().item.getItems()) {
@@ -31,14 +31,14 @@ public class BrushEmiRecipe extends BasicEmiRecipe
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
-        widgets.addSlot(this.inputs.get(0), 0, 56).drawBack(false);
+        widgets.addSlot(this.inputs.get(0), 0, 74).drawBack(false);
 
         for (int i = 0; i < this.outputs.size(); i++){
-            int row = (int) Math.floor(i / 7f);
-            widgets.addSlot(this.outputs.get(i), (i - (row * 7)) * 18, row * 18).drawBack(false).recipeContext(this);
+            int row = (int) Math.floor(i / 8f);
+            widgets.addSlot(this.outputs.get(i), (i - (row * 8)) * 18, row * 18).drawBack(false).recipeContext(this);
         }
 
-        var name = recipe.id().getPath().replace("archaeology/", "").replaceAll("_[0-9]", "");
-        widgets.addText(Component.translatable(JEArchaeology.MODID + ".brush.structure." + name), 22, 60, 0xFF000000, false);
+        var name = recipe.id().getPath().replace("archeology/", "").replace("archaeology/", "").replaceAll("_[0-9]", "");
+        widgets.addText(Component.translatable(JEArchaeology.MODID + ".brush.structure." + name), 22, 78, 0xFF000000, false);
     }
 }

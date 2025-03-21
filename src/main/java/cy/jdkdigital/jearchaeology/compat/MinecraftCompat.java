@@ -18,10 +18,10 @@ public class MinecraftCompat
         return new HashMap<>() {{
             put(BuiltInLootTables.DESERT_WELL_ARCHAEOLOGY, Pair.of("desert_well", SUS_BLOCKS));
             put(BuiltInLootTables.DESERT_PYRAMID_ARCHAEOLOGY, Pair.of("desert_pyramid", SUS_BLOCKS));
-            put(BuiltInLootTables.TRAIL_RUINS_ARCHAEOLOGY_COMMON, Pair.of("trail_ruins", SUS_BLOCKS));
-            put(BuiltInLootTables.TRAIL_RUINS_ARCHAEOLOGY_RARE, Pair.of("trail_ruins", SUS_BLOCKS));
-            put(BuiltInLootTables.OCEAN_RUIN_WARM_ARCHAEOLOGY, Pair.of("warm_ocean_ruin", SUS_BLOCKS));
-            put(BuiltInLootTables.OCEAN_RUIN_COLD_ARCHAEOLOGY, Pair.of("cold_ocean_ruin", SUS_BLOCKS));
+            put(BuiltInLootTables.TRAIL_RUINS_ARCHAEOLOGY_COMMON, Pair.of("trail_ruins_common", SUS_BLOCKS));
+            put(BuiltInLootTables.TRAIL_RUINS_ARCHAEOLOGY_RARE, Pair.of("trail_ruins_rare", SUS_BLOCKS));
+            put(BuiltInLootTables.OCEAN_RUIN_WARM_ARCHAEOLOGY, Pair.of("ocean_ruin_warm", SUS_BLOCKS));
+            put(BuiltInLootTables.OCEAN_RUIN_COLD_ARCHAEOLOGY, Pair.of("ocean_ruin_cold", SUS_BLOCKS));
         }};
     }
 }

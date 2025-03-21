@@ -1,6 +1,7 @@
 package cy.jdkdigital.jearchaeology.compat;
 
 import com.mojang.datafixers.util.Pair;
+import cy.jdkdigital.jearchaeology.JEArchaeology;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,7 +36,9 @@ public class BetterAcheologyCompat
     }
 
     public static void addRecipeCatalyst(IRecipeCatalystRegistration registration, RecipeType<?> recipeType) {
-        registration.addRecipeCatalyst(new ItemStack(Objects.requireNonNull(BuiltInRegistries.ITEM.get(ResourceLocation.parse("betterarcheology:iron_brush")))), recipeType);
-        registration.addRecipeCatalyst(new ItemStack(Objects.requireNonNull(BuiltInRegistries.ITEM.get(ResourceLocation.parse("betterarcheology:diamond_brush")))), recipeType);
+        JEArchaeology.LOGGER.info("adding brushes");
+        registration.addRecipeCatalyst(BuiltInRegistries.ITEM.get(ResourceLocation.parse("betterarcheology:iron_brush")).getDefaultInstance(), recipeType);
+        registration.addRecipeCatalyst(BuiltInRegistries.ITEM.get(ResourceLocation.parse("betterarcheology:diamond_brush")).getDefaultInstance(), recipeType);
+        registration.addRecipeCatalyst(BuiltInRegistries.ITEM.get(ResourceLocation.parse("betterarcheology:netherite_brush")).getDefaultInstance(), recipeType);
     }
 }

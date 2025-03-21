@@ -2,6 +2,7 @@ package cy.jdkdigital.jearchaeology.compat;
 
 import com.mojang.datafixers.util.Pair;
 import cy.jdkdigital.jearchaeology.Config;
+import cy.jdkdigital.jearchaeology.JEArchaeology;
 import cy.jdkdigital.jearchaeology.jei.JeiPlugin;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -27,7 +28,8 @@ public class CompatHandler
     }
 
     public static void addRecipeCatalyst(IRecipeCatalystRegistration registration, RecipeType<?> recipeType) {
-        if (ModList.get().isLoaded("betterarcheology") && Config.betterarcheology_compat && recipeType.equals(JeiPlugin.BRUSH_RECIPE_TYPE)) {
+        JEArchaeology.LOGGER.info("addRecipeCatalyst compat " + (ModList.get().isLoaded("betterarcheology")) + " " + (Config.betterarcheology_compat) + " " + (recipeType.equals(JeiPlugin.BRUSH_RECIPE_TYPE.get())));
+        if (ModList.get().isLoaded("betterarcheology") && Config.betterarcheology_compat && recipeType.equals(JeiPlugin.BRUSH_RECIPE_TYPE.get())) {
             BetterAcheologyCompat.addRecipeCatalyst(registration, recipeType);
         }
     }

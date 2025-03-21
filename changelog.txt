@@ -1,3 +1,9 @@
+1.21.1-1.1.6
+
+- Fixed location names not being translated
+- Added Japanese localization (Abbage230)
+
+
 1.21.0-1.1.5
 
 - Fixed location names not showing in JEI

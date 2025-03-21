@@ -103,7 +103,8 @@ dependencies {
 //    implementation fg.deobf("curse.maven:ato-405593:4844097")
 //    implementation fg.deobf("curse.maven:allthemodium-364466:4892369")
 //    implementation fg.deobf("curse.maven:yungs-api-421850:5147001")
-//    implementation fg.deobf("curse.maven:better-archeology-835687:5268829")
+    implementation "curse.maven:resourceful-config-714059:6142616"
+    implementation "curse.maven:better-archeology-835687:5992172"
 }
 
 tasks.withType(ProcessResources).configureEach {
