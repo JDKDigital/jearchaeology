@@ -24,6 +24,7 @@ import net.neoforged.neoforge.common.util.FakePlayerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Helper
 {
@@ -43,10 +44,17 @@ public class Helper
                 Map<Item, ItemStack> items = new HashMap<>();
                 var table = level.getServer().reloadableRegistries().getLootTable(lootTableKey);
                 if (!table.equals(LootTable.EMPTY)) {
+                    AtomicInteger countSinceLastHit = new AtomicInteger();
                     for (int i = 0; i < 600; i++) {
+                        if (countSinceLastHit.get() > 50) {
+                            break;
+                        }
                         table.getRandomItems(lootparams).forEach(itemStack -> {
                             if (!items.containsKey(itemStack.getItem())) {
+                                countSinceLastHit.set(0);
                                 items.put(itemStack.getItem(), itemStack);
+                            } else {
+                                countSinceLastHit.getAndIncrement();
                             }
                         });
                     }

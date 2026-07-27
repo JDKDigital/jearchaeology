@@ -24,11 +24,16 @@ public class CompatHandler
         if (ModList.get().isLoaded("betterarcheology") && Config.betterarcheology_compat) {
             tables.putAll(BetterAcheologyCompat.getTables());
         }
+        if (ModList.get().isLoaded("cobblemon") && Config.cobblemon_compat) {
+            tables.putAll(CobblemonCompat.getTables());
+        }
+        if (ModList.get().isLoaded("mega_showdown") && Config.mega_showdown_compat) {
+            tables.putAll(MegaShowdownCompat.getTables());
+        }
         return tables;
     }
 
     public static void addRecipeCatalyst(IRecipeCatalystRegistration registration, RecipeType<?> recipeType) {
-        JEArchaeology.LOGGER.info("addRecipeCatalyst compat " + (ModList.get().isLoaded("betterarcheology")) + " " + (Config.betterarcheology_compat) + " " + (recipeType.equals(JeiPlugin.BRUSH_RECIPE_TYPE.get())));
         if (ModList.get().isLoaded("betterarcheology") && Config.betterarcheology_compat && recipeType.equals(JeiPlugin.BRUSH_RECIPE_TYPE.get())) {
             BetterAcheologyCompat.addRecipeCatalyst(registration, recipeType);
         }

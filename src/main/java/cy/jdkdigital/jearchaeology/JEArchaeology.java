@@ -66,30 +66,6 @@ public class JEArchaeology
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
-    @EventBusSubscriber(modid = JEArchaeology.MODID, bus = EventBusSubscriber.Bus.MOD)
-    class ModEvents
-    {
-        @SubscribeEvent
-        public static void payloadHandler(RegisterPayloadHandlersEvent event) {
-//            final PayloadRegistrar registrar = event.registrar(JEArchaeology.MODID).versioned("1").optional();
-//            registrar.playToClient(
-//                    BrushingDataMessage.TYPE,
-//                    BrushingDataMessage.STREAM_CODEC,
-//                    new DirectionalPayloadHandler<>(
-//                            BrushingDataMessage::clientHandle,
-//                            BrushingDataMessage::serverHandle
-//                    )
-//            );
-//            registrar.playToClient(
-//                    SnifferDataMessage.TYPE,
-//                    SnifferDataMessage.STREAM_CODEC,
-//                    new DirectionalPayloadHandler<>(
-//                            SnifferDataMessage::clientHandle,
-//                            SnifferDataMessage::serverHandle
-//                    )
-//            );
-        }
-    }
     @EventBusSubscriber(modid = JEArchaeology.MODID)
     class Events
     {
@@ -100,10 +76,12 @@ public class JEArchaeology
                 var recipeManager = player.get().getServer().getRecipeManager();
 
                 var sniffRecipes = recipeManager.getAllRecipesFor(SNIFF_TYPE.get());
-                if (sniffRecipes.size() == 0) {
+                if (sniffRecipes.isEmpty()) {
+                    long startTime = System.nanoTime();
                     Collection<RecipeHolder<?>> allRecipes = new ArrayList<>(recipeManager.getRecipes());
                     allRecipes.addAll(Helper.getAllBrushingRecipes(event.getPlayerList().getServer().getLevel(Level.OVERWORLD)));
                     allRecipes.addAll(Helper.getAllSniffingRecipes(event.getPlayerList().getServer().getLevel(Level.OVERWORLD)));
+                    LOGGER.debug("Collecting sniffer and brushing recipes took " + ((System.nanoTime() - startTime) / 1000000) + "ms");
                     recipeManager.replaceRecipes(allRecipes);
                 }
             }

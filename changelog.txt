@@ -1,3 +1,10 @@
+1.21.1-1.2.0
+
+- Add Cobblemon Compat
+- Add Cobblemon: Mega Showdown Compat
+- Optimized brush loot calculation
+
+
 1.21.1-1.1.6
 
 - Fixed location names not being translated

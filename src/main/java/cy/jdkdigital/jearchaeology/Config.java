@@ -19,15 +19,27 @@ public class Config
             .comment("Enable compatibility with Better Archeology")
             .define("betterarcheology_compat", true);
 
+    private static final ModConfigSpec.BooleanValue COBBLEMON_COMPAT = BUILDER
+            .comment("Enable compatibility with Cobblemon")
+            .define("cobblemon_compat", true);
+
+    private static final ModConfigSpec.BooleanValue MEGA_SHOWDOWN_COMPAT = BUILDER
+            .comment("Enable compatibility with Cobblemon: Mega Showdown")
+            .define("mega_showdown_compat", true);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     public static boolean atm_compat;
     public static boolean betterarcheology_compat;
+    public static boolean cobblemon_compat;
+    public static boolean mega_showdown_compat;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
     {
         atm_compat = ATM_COMPAT.get();
         betterarcheology_compat = BETTERACHEOLOGY_COMPAT.get();
+        cobblemon_compat = COBBLEMON_COMPAT.get();
+        mega_showdown_compat = MEGA_SHOWDOWN_COMPAT.get();
     }
 }
