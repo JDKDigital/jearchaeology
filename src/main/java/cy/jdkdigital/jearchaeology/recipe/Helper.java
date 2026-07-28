@@ -5,14 +5,17 @@ import com.mojang.datafixers.util.Pair;
 import cy.jdkdigital.jearchaeology.JEArchaeology;
 import cy.jdkdigital.jearchaeology.compat.CompatHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -31,6 +34,10 @@ public class Helper
     private static final UUID BRUSHER_PLAYER_UUID = UUID.nameUUIDFromBytes("jea_brusher_player".getBytes(StandardCharsets.UTF_8));
     private static List<RecipeHolder<?>> cachedBrushingRecipes = new ArrayList<>();
     private static List<RecipeHolder<?>> cachedSniffingRecipes = new ArrayList<>();
+
+    private static ResourceKey<Recipe<?>> recipeKey(String name) {
+        return ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(JEArchaeology.MODID, name));
+    }
 
     public static List<RecipeHolder<?>> getAllBrushingRecipes(ServerLevel level) {
         if (level != null && cachedBrushingRecipes.isEmpty()) {
@@ -60,15 +67,16 @@ public class Helper
                     }
                 }
                 String locationName = pair.getFirst();
-                if (items.size() > 64) {
-                    recipeList.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, locationName + "_4"), new BrushingRecipe(Ingredient.of(items.values().stream().limit(42).skip(21).toList().toArray(new ItemStack[0])), 1f, pair.getSecond())));
-                    recipeList.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, locationName + "_3"), new BrushingRecipe(Ingredient.of(items.values().stream().skip(42).toList().toArray(new ItemStack[0])), 1f, pair.getSecond())));
+                List<ItemStack> loot = List.copyOf(items.values());
+                if (loot.size() > 64) {
+                    recipeList.add(new RecipeHolder<>(recipeKey(locationName + "_4"), new BrushingRecipe(loot.stream().limit(42).skip(21).toList(), 1f, pair.getSecond())));
+                    recipeList.add(new RecipeHolder<>(recipeKey(locationName + "_3"), new BrushingRecipe(loot.stream().skip(42).toList(), 1f, pair.getSecond())));
                 }
-                if (items.size() > 32) {
-                    recipeList.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, locationName + "_2"), new BrushingRecipe(Ingredient.of(items.values().stream().limit(21).toList().toArray(new ItemStack[0])), 1f, pair.getSecond())));
-                    recipeList.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, locationName + "_1"), new BrushingRecipe(Ingredient.of(items.values().stream().skip(21).toList().toArray(new ItemStack[0])), 1f, pair.getSecond())));
+                if (loot.size() > 32) {
+                    recipeList.add(new RecipeHolder<>(recipeKey(locationName + "_2"), new BrushingRecipe(loot.stream().limit(21).toList(), 1f, pair.getSecond())));
+                    recipeList.add(new RecipeHolder<>(recipeKey(locationName + "_1"), new BrushingRecipe(loot.stream().skip(21).toList(), 1f, pair.getSecond())));
                 } else {
-                    recipeList.add(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, locationName), new BrushingRecipe(Ingredient.of(items.values().toArray(new ItemStack[0])), 1f, pair.getSecond())));
+                    recipeList.add(new RecipeHolder<>(recipeKey(locationName), new BrushingRecipe(loot, 1f, pair.getSecond())));
                 }
             });
             cachedBrushingRecipes = recipeList;
@@ -78,7 +86,7 @@ public class Helper
 
     public static List<RecipeHolder<?>> getAllSniffingRecipes(ServerLevel level) {
         if (level != null && cachedSniffingRecipes.isEmpty()) {
-            var sniffer = EntityType.SNIFFER.create(level);
+            var sniffer = EntityType.SNIFFER.create(level, EntitySpawnReason.NATURAL);
             LootParams lootparams = (new LootParams.Builder(level)).withParameter(LootContextParams.ORIGIN, new Vec3(0, 0, 0)).withParameter(LootContextParams.THIS_ENTITY, sniffer).create(LootContextParamSets.GIFT);
             Map<Item, ItemStack> items = new HashMap<>();
             var table = level.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.SNIFFER_DIGGING);
@@ -89,7 +97,7 @@ public class Helper
                     }
                 });
             }
-            cachedSniffingRecipes = List.of(new RecipeHolder<>(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, "sniffing"), new SniffRecipe(Ingredient.of(items.values().toArray(new ItemStack[0])), 1f)));
+            cachedSniffingRecipes = List.of(new RecipeHolder<>(recipeKey("sniffing"), new SniffRecipe(List.copyOf(items.values()), 1f)));
         }
         return cachedSniffingRecipes;
     }

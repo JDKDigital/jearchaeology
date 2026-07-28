@@ -9,7 +9,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -21,14 +21,14 @@ import java.util.List;
 public class EmiPlugin implements dev.emi.emi.api.EmiPlugin
 {
     public static final EmiRecipeCategory BRUSHING_CATEGORY = new EmiRecipeCategory(
-            ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, "brushing"),
+            Identifier.fromNamespaceAndPath(JEArchaeology.MODID, "brushing"),
             EmiStack.of(Items.BRUSH),
-            new EmiTexture(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, "textures/gui/emi/icon/brush.png"), 0, 0, 16, 16, 16, 16, 16, 16)
+            new EmiTexture(Identifier.fromNamespaceAndPath(JEArchaeology.MODID, "textures/gui/emi/icon/brush.png"), 0, 0, 16, 16, 16, 16, 16, 16)
     );
     public static final EmiRecipeCategory SNIFFING_CATEGORY = new EmiRecipeCategory(
-            ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, "sniffing"),
+            Identifier.fromNamespaceAndPath(JEArchaeology.MODID, "sniffing"),
             EmiStack.of(Items.SNIFFER_EGG),
-            new EmiTexture(ResourceLocation.fromNamespaceAndPath(JEArchaeology.MODID, "textures/gui/emi/icon/sniff.png"), 0, 0, 16, 16, 16, 16, 16, 16)
+            new EmiTexture(Identifier.fromNamespaceAndPath(JEArchaeology.MODID, "textures/gui/emi/icon/sniff.png"), 0, 0, 16, 16, 16, 16, 16, 16)
     );
 
     @Override

@@ -1,12 +1,14 @@
 package cy.jdkdigital.jearchaeology;
 
 import com.mojang.logging.LogUtils;
-import cy.jdkdigital.jearchaeology.jei.SniffRecipeCategory;
+import cy.jdkdigital.jearchaeology.client.ClientRecipeCache;
+import cy.jdkdigital.jearchaeology.network.ArchaeologyRecipesPayload;
 import cy.jdkdigital.jearchaeology.recipe.BrushingRecipe;
 import cy.jdkdigital.jearchaeology.recipe.Helper;
 import cy.jdkdigital.jearchaeology.recipe.SniffRecipe;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -21,14 +23,14 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 @Mod(JEArchaeology.MODID)
 public class JEArchaeology
@@ -46,8 +48,8 @@ public class JEArchaeology
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, MODID);
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, MODID);
 
-    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<SniffRecipe>> SNIFF = RECIPE_SERIALIZERS.register("sniff", SniffRecipe.Serializer::new);
-    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BrushingRecipe>> BRUSH = RECIPE_SERIALIZERS.register("brush", BrushingRecipe.Serializer::new);
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<SniffRecipe>> SNIFF = RECIPE_SERIALIZERS.register("sniff", () -> SniffRecipe.SERIALIZER);
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BrushingRecipe>> BRUSH = RECIPE_SERIALIZERS.register("brush", () -> BrushingRecipe.SERIALIZER);
     public static DeferredHolder<RecipeType<?>, RecipeType<SniffRecipe>> SNIFF_TYPE = RECIPE_TYPES.register("sniff", () -> new RecipeType<>() {});
     public static DeferredHolder<RecipeType<?>, RecipeType<BrushingRecipe>> BRUSH_TYPE = RECIPE_TYPES.register("brush", () -> new RecipeType<>() {});
 
@@ -70,21 +72,30 @@ public class JEArchaeology
     class Events
     {
         @SubscribeEvent
-        public static void onDataSync(OnDatapackSyncEvent event) {
-            var player = event.getRelevantPlayers().findFirst();
-            if (player.isPresent() && player.get().getServer() != null) {
-                var recipeManager = player.get().getServer().getRecipeManager();
+        public static void registerPayloads(RegisterPayloadHandlersEvent event) {
+            event.registrar("1").playToClient(
+                    ArchaeologyRecipesPayload.TYPE,
+                    ArchaeologyRecipesPayload.STREAM_CODEC,
+                    (payload, context) -> ClientRecipeCache.accept(payload)
+            );
+        }
 
-                var sniffRecipes = recipeManager.getAllRecipesFor(SNIFF_TYPE.get());
-                if (sniffRecipes.isEmpty()) {
-                    long startTime = System.nanoTime();
-                    Collection<RecipeHolder<?>> allRecipes = new ArrayList<>(recipeManager.getRecipes());
-                    allRecipes.addAll(Helper.getAllBrushingRecipes(event.getPlayerList().getServer().getLevel(Level.OVERWORLD)));
-                    allRecipes.addAll(Helper.getAllSniffingRecipes(event.getPlayerList().getServer().getLevel(Level.OVERWORLD)));
-                    LOGGER.debug("Collecting sniffer and brushing recipes took " + ((System.nanoTime() - startTime) / 1000000) + "ms");
-                    recipeManager.replaceRecipes(allRecipes);
-                }
+        @SubscribeEvent
+        public static void onDataSync(OnDatapackSyncEvent event) {
+            ServerLevel level = event.getPlayerList().getServer().getLevel(Level.OVERWORLD);
+            if (level == null) {
+                return;
             }
+
+            long startTime = System.nanoTime();
+            List<RecipeHolder<?>> brushing = Helper.getAllBrushingRecipes(level);
+            List<RecipeHolder<?>> sniffing = Helper.getAllSniffingRecipes(level);
+            List<RecipeHolder<?>> recipes = new ArrayList<>(brushing);
+            recipes.addAll(sniffing);
+            LOGGER.debug("Collecting {} brushing and {} sniffing recipes took {}ms", brushing.size(), sniffing.size(), (System.nanoTime() - startTime) / 1000000);
+
+            ArchaeologyRecipesPayload payload = new ArchaeologyRecipesPayload(recipes);
+            event.getRelevantPlayers().forEach(player -> PacketDistributor.sendToPlayer(player, payload));
         }
     }
 }

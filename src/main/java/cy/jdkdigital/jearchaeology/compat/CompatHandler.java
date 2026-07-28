@@ -4,10 +4,10 @@ import com.mojang.datafixers.util.Pair;
 import cy.jdkdigital.jearchaeology.Config;
 import cy.jdkdigital.jearchaeology.JEArchaeology;
 import cy.jdkdigital.jearchaeology.jei.JeiPlugin;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.fml.ModList;
@@ -33,7 +33,7 @@ public class CompatHandler
         return tables;
     }
 
-    public static void addRecipeCatalyst(IRecipeCatalystRegistration registration, RecipeType<?> recipeType) {
+    public static void addRecipeCatalyst(IRecipeCatalystRegistration registration, IRecipeType<?> recipeType) {
         if (ModList.get().isLoaded("betterarcheology") && Config.betterarcheology_compat && recipeType.equals(JeiPlugin.BRUSH_RECIPE_TYPE.get())) {
             BetterAcheologyCompat.addRecipeCatalyst(registration, recipeType);
         }

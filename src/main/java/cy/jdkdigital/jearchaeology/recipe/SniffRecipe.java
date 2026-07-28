@@ -1,31 +1,52 @@
 package cy.jdkdigital.jearchaeology.recipe;
 
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cy.jdkdigital.jearchaeology.JEArchaeology;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 public class SniffRecipe implements Recipe<RecipeInput>
 {
-    public final Ingredient item;
+    public static final MapCodec<SniffRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(
+            builder -> builder.group(
+                            LootItems.CODEC.fieldOf("items").forGetter(recipe -> recipe.items),
+                            Codec.FLOAT.fieldOf("chance").orElse(0.05f).forGetter(recipe -> recipe.chance)
+                    )
+                    .apply(builder, SniffRecipe::new)
+    );
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, SniffRecipe> STREAM_CODEC = StreamCodec.composite(
+            ItemStack.OPTIONAL_LIST_STREAM_CODEC, recipe -> recipe.items,
+            ByteBufCodecs.FLOAT, recipe -> recipe.chance,
+            SniffRecipe::new
+    );
+
+    public static final RecipeSerializer<SniffRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+
+    /**
+     * The items a sniffer can turn up. They are rolled off the sniffer digging loot table rather than matched
+     * against an input, so they keep their counts and components and are only ever displayed.
+     */
+    public final List<ItemStack> items;
     public final float chance;
 
-    public SniffRecipe(Ingredient item, float chance) {
-        this.item = item;
+    public SniffRecipe(List<ItemStack> items, float chance) {
+        this.items = items;
         this.chance = chance;
     }
 
@@ -36,74 +57,42 @@ public class SniffRecipe implements Recipe<RecipeInput>
 
     @Nonnull
     @Override
-    public ItemStack assemble(RecipeInput inv, HolderLookup.Provider provider) {
+    public ItemStack assemble(RecipeInput inv) {
         return ItemStack.EMPTY;
     }
 
+    @Nonnull
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
+    public String group() {
+        return "";
+    }
+
+    @Override
+    public boolean showNotification() {
         return false;
     }
 
     @Nonnull
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider provider) {
-        return ItemStack.EMPTY;
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
 
     @Nonnull
     @Override
-    public RecipeSerializer<?> getSerializer() {
-        return JEArchaeology.SNIFF.get();
+    public RecipeBookCategory recipeBookCategory() {
+        return RecipeBookCategories.CRAFTING_MISC;
     }
 
     @Nonnull
     @Override
-    public RecipeType<?> getType() {
+    public RecipeSerializer<SniffRecipe> getSerializer() {
+        return SERIALIZER;
+    }
+
+    @Nonnull
+    @Override
+    public RecipeType<SniffRecipe> getType() {
         return JEArchaeology.SNIFF_TYPE.get();
-    }
-
-    public static class Serializer implements RecipeSerializer<SniffRecipe>
-    {
-        private static final MapCodec<SniffRecipe> CODEC = RecordCodecBuilder.mapCodec(
-                builder -> builder.group(
-                                Ingredient.CODEC.fieldOf("item").forGetter(recipe -> recipe.item),
-                                Codec.FLOAT.fieldOf("chance").orElse(0.05f).forGetter(recipe -> recipe.chance)
-                        )
-                        .apply(builder, SniffRecipe::new)
-        );
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, SniffRecipe> STREAM_CODEC = StreamCodec.of(
-                SniffRecipe.Serializer::toNetwork, SniffRecipe.Serializer::fromNetwork
-        );
-
-        @Override
-        public MapCodec<SniffRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, SniffRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
-
-        public static SniffRecipe fromNetwork(@Nonnull RegistryFriendlyByteBuf buffer) {
-            try {
-                return new SniffRecipe(Ingredient.CONTENTS_STREAM_CODEC.decode(buffer), buffer.readFloat());
-            } catch (Exception e) {
-                JEArchaeology.LOGGER.error("Error reading sniff recipe from packet.", e);
-                throw e;
-            }
-        }
-
-        public static void toNetwork(@Nonnull RegistryFriendlyByteBuf buffer, SniffRecipe recipe) {
-            try {
-                Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.item);
-                buffer.writeFloat(recipe.chance);
-            } catch (Exception e) {
-                JEArchaeology.LOGGER.error("Error writing sniff recipe to packet.", e);
-                throw e;
-            }
-        }
     }
 }
